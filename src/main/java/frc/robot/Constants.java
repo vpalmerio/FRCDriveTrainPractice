@@ -14,8 +14,8 @@ package frc.robot;
  */
 public final class Constants {
 
-    public static int m_left1 = 0;
-    public static int m_left2 = 1;
+    public static int m_left1 = 1;
+    public static int m_left2 = 4;
     public static int m_right1 = 2;
     public static int m_right2 = 3;
 
