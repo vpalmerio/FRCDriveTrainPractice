@@ -35,7 +35,7 @@ public class RobotContainer {
 
     xbox = new XboxController(1);
 
-    ahrs = new AHRS(SPI.Port.kMXP);
+    //ahrs = new AHRS(SPI.Port.kMXP);
 
     m_driveTrain = new DriveTrain();
 
