@@ -9,9 +9,11 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.AutonomousCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 /**
@@ -22,25 +24,26 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  public static DriveTrain m_driveTrain;
+  public static DriveTrain driveTrain = new DriveTrain();
 
-  public static XboxController xbox;
+  public static XboxController xbox = new XboxController(Constants.xboxControllerPort);
 
   AHRS ahrs;
 
   private ParallelCommandGroup teleopCommand;
 
+  private AutonomousCommand autoCommand = new AutonomousCommand();
+
+  
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    xbox = new XboxController(1);
-
-    //ahrs = new AHRS(SPI.Port.kMXP);
-
-    m_driveTrain = new DriveTrain();
+    //ahrs = new AHRS(SPI.Port.kMXP); 
 
     teleopCommand = new ParallelCommandGroup(
-      new DriveCommand( ()-> xbox.getLeftY(), ()-> xbox.getLeftX())
+      new DriveCommand()
+
     );
 
 
@@ -50,5 +53,7 @@ public class RobotContainer {
     return teleopCommand;
   }
 
-  
+  public Command getAutonomousCommand() {
+    return autoCommand.getRamseteCommand();
+  }
 }

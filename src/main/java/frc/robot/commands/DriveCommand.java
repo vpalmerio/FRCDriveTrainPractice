@@ -2,23 +2,15 @@ package frc.robot.commands;
 
 import frc.robot.RobotContainer;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class DriveCommand extends CommandBase {
-    
-    private DoubleSupplier moveSpeed;
-    private DoubleSupplier rotateSpeed;
 
     //this double supplier object usage is necessary to get the robot to move
     //I still don't know why
-    public DriveCommand(DoubleSupplier moveSpeed, DoubleSupplier rotateSpeed) {
+    public DriveCommand() {      
 
-        this.moveSpeed = moveSpeed;
-        this.rotateSpeed = rotateSpeed;        
-
-        addRequirements(RobotContainer.m_driveTrain);
+        addRequirements(RobotContainer.driveTrain);
     }
 
     @Override
@@ -26,7 +18,9 @@ public class DriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        RobotContainer.m_driveTrain.manualDrive(moveSpeed.getAsDouble(), rotateSpeed.getAsDouble());
+        RobotContainer.driveTrain.manualDrive(
+            RobotContainer.xbox.getLeftY(), RobotContainer.xbox.getRightX()
+        );
     }
 
     @Override
