@@ -19,7 +19,7 @@ public class DriveCommand extends CommandBase {
     @Override
     public void execute() {
         RobotContainer.driveTrain.manualDrive(
-            RobotContainer.xbox.getLeftY(), RobotContainer.xbox.getRightX()
+            RobotContainer.xbox.getLeftY(), RobotContainer.xbox.getLeftX()
         );
     }
 

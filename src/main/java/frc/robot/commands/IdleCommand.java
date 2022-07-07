@@ -19,7 +19,7 @@ public class IdleCommand implements Runnable {
 
     @Override
     public void run() {
-            driveTrain.preventMotorSafetyCheckError();
+            driveTrain.tankDriveVolts(0,0);
     }
     
 }

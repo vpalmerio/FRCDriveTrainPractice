@@ -1,12 +1,12 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "Talon FX[0]": {
+      "Talon FX[0]/Integrated Sensor": {
         "header": {
           "open": true
         }
       },
-      "Talon FX[1]": {
+      "Talon FX[1]/Integrated Sensor": {
         "header": {
           "open": true
         }
@@ -16,7 +16,12 @@
           "open": true
         }
       },
-      "Talon FX[3]": {
+      "Talon FX[2]/Integrated Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX[3]/Integrated Sensor": {
         "header": {
           "open": true
         }

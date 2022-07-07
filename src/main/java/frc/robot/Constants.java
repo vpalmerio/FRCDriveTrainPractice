@@ -23,32 +23,52 @@ public final class Constants {
     public static int right1CANPort = 0;
     public static int right2CANPort = 1;
 
-    //currently unrealistic values because we screwed up testing
-    public static final double ksVolts = 0.52644;
-    public static final double kvVoltSecondsPerMeter = 0.023164;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.00054074;
-    public static final double kPDriveVel = 0.011566;
+    public static boolean left_side_inverted = true; 
+    public static boolean right_side_inverted = !left_side_inverted;
 
-    //distance between centers of the front and back wheels on one side of the robot chassis
-    //I do not have this value on hand so I am using tutorials values
-    public static final double kTrackWidthMeters = 0.69;
+
+    //currently unrealistic values because we screwed up testing
+    public static final double ksVolts = 0.58172;
+    public static final double kvVoltSecondsPerMeter = 0.22592;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.16844;
+    public static final double kPDriveVel = 0.25802;
+
+    //distance between centers of the left side center of one wheel to the right center of the other wheel, across the robot chassis
+    public static final double kTrackWidthMeters = 0.5969;
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackWidthMeters);
     
     
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
     //^^these might have to be tuned
 
     //tutorial said these values were fine
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;
 
-    public static final int kEncoderCPR = 2048;
-    public static final double kWheelDiameterMeters = 0.15;
-    //^^needs to be changed
-    public static final double kEncoderDistancePerPulse = 
-        // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
+    
+    
+   
+   
+    //Getting distance traveled per encoder cycle
+    public static final double kWheelDiameterMeters = 0.146; //measured
 
+    public static final int kEncoderCPR = 2048; //this is according to Falcon500 documentation
+    //encoder cycles per revolution (one full turn of motor shaft), also, pulses can be interpreted as cycles or counts
+
+        //factor in gear ratio to determine how far robot travels per cycle
+        //first gear ratio, 9:62
+        //second gear ratio, 20:28
+        //multiply the two to get 180:1736
+        //its a gear reduction (for every turn of the motor shaft, the robot wheel only turns a fraction of its full revolution)
+            //^^flip gear ratios 1736:180 (does this matter? sys id requires it flipped like this, as far as I understand)
+            //convert to x/1 -> 1736/180:180/180 = 9.6444... : 1
+        //the motor shaft must turn 9.6444.. times for the robot wheel to make a full revolution
+    public static final double kGearRatio = 1736/180;
+
+    //multiply 9.6444.. by 2048 to get the amount of encoder cycles for the wheel to turn once
+    public static final double kEncoderCyclesPerFullWheelTurn = kGearRatio*kEncoderCPR;
+    //FINALLY, divide the wheel circumference by the result from the last step to get the distance per encoder cycle!!
+    public static final double kDistancePerEncoderCycle = (kWheelDiameterMeters * Math.PI) / kEncoderCyclesPerFullWheelTurn;
 }
