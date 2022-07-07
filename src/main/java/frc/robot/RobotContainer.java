@@ -32,7 +32,7 @@ public class RobotContainer {
 
   private ParallelCommandGroup teleopCommand;
 
-  private AutonomousCommand autoCommand = new AutonomousCommand();
+  private static AutonomousCommand autoCommand = new AutonomousCommand();
 
   
 
@@ -55,5 +55,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoCommand.getRamseteCommand();
+  }
+
+  public void resetOdometryAutonomous() {
+    autoCommand.resetOdometryInitialPose();
   }
 }

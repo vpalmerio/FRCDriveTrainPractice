@@ -29,13 +29,14 @@ public class AutonomousCommand {
                                    Constants.kvVoltSecondsPerMeter,
                                    Constants.kaVoltSecondsSquaredPerMeter),
         Constants.kDriveKinematics,
-        10
+        7
     );
 
     TrajectoryConfig config =
         new TrajectoryConfig(Constants.kMaxSpeedMetersPerSecond, Constants.kMaxAccelerationMetersPerSecondSquared)
             .setKinematics(Constants.kDriveKinematics) //ensures max speed is actually obeyed
-            .addConstraint(autoVoltageConstraint); //voltage constraint
+            .addConstraint(autoVoltageConstraint)
+            .setReversed(false); //voltage constraint
 
     //Taken from wpilib tutorial
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
@@ -43,8 +44,8 @@ public class AutonomousCommand {
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
         List.of(
-            new Translation2d(1, 1),
-            new Translation2d(2, -1)
+            new Translation2d(1, -1),
+            new Translation2d(2, 1)
         ),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
@@ -68,9 +69,13 @@ public class AutonomousCommand {
         driveTrain
     );
 
+    public void resetOdometryInitialPose() {
+        driveTrain.resetOdometry(exampleTrajectory.getInitialPose());
+    }
+
     public Command getRamseteCommand() {
         // Reset odometry to the starting pose of the trajectory.
-        driveTrain.resetOdometry(exampleTrajectory.getInitialPose());
+        resetOdometryInitialPose();
 
         IdleCommand idle = new IdleCommand(driveTrain);
 
