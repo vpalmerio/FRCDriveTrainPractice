@@ -28,10 +28,10 @@ public final class Constants {
 
 
     //currently unrealistic values because we screwed up testing
-    public static final double ksVolts = 0.58172;
-    public static final double kvVoltSecondsPerMeter = 0.22592;
-    public static final double kaVoltSecondsSquaredPerMeter = 0.16844;
-    public static final double kPDriveVel = 0.25802;
+    public static final double ksVolts = 0.59348;
+    public static final double kvVoltSecondsPerMeter = 0.1763; // 2.1763;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.15926;
+    public static final double kPDriveVel = 2.457;
 
     //distance between centers of the left side center of one wheel to the right center of the other wheel, across the robot chassis
     public static final double kTrackWidthMeters = 0.5969;
@@ -52,12 +52,12 @@ public final class Constants {
    
    
     //Getting distance traveled per encoder cycle
-    public static final double kWheelDiameterMeters = 0.146; //measured
+    public static final double kWheelDiameterMeters = 0.1524; //measured
 
     public static final int kEncoderCPR = 2048; //this is according to Falcon500 documentation
-    //encoder cycles per revolution (one full turn of motor shaft), also, pulses can be interpreted as cycles or counts
+    //encoder counts per revolution (one full turn of motor shaft), also, pulses can be interpreted as counts
 
-        //factor in gear ratio to determine how far robot travels per cycle
+        //factor in gear ratio to determine how far robot travels per count
         //first gear ratio, 9:62
         //second gear ratio, 20:28
         //multiply the two to get 180:1736
@@ -67,8 +67,8 @@ public final class Constants {
         //the motor shaft must turn 9.6444.. times for the robot wheel to make a full revolution
     public static final double kGearRatio = 1736/180;
 
-    //multiply 9.6444.. by 2048 to get the amount of encoder cycles for the wheel to turn once
-    public static final double kEncoderCyclesPerFullWheelTurn = kGearRatio*kEncoderCPR;
-    //FINALLY, divide the wheel circumference by the result from the last step to get the distance per encoder cycle!!
-    public static final double kDistancePerEncoderCycle = (kWheelDiameterMeters * Math.PI) / kEncoderCyclesPerFullWheelTurn;
+    //multiply 9.6444.. by 2048 to get the amount of encoder counts for the wheel to turn once
+    public static final double kEncoderCountsPerFullWheelTurn = kGearRatio*kEncoderCPR;
+    //FINALLY, divide the wheel circumference by the result from the last step to get the distance per encoder counts!!
+    public static final double kDistancePerEncoderCount = (kWheelDiameterMeters * Math.PI) / kEncoderCountsPerFullWheelTurn;
 }

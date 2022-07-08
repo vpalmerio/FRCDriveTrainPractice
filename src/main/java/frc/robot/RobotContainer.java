@@ -7,7 +7,7 @@ package frc.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.SPI;
+
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.AutonomousCommand;
 import frc.robot.commands.DriveCommand;
@@ -39,7 +39,7 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    //ahrs = new AHRS(SPI.Port.kMXP); 
+    
 
     teleopCommand = new ParallelCommandGroup(
       new DriveCommand()

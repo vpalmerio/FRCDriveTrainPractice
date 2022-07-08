@@ -1,24 +1,35 @@
 package frc.robot.subsystems;
 
+//Falcon Motors
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+//Driving and info
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+
+//Gyro
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+
+//Misc
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+//Simulation
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
+
+//Constants
 import frc.robot.Constants;
 
 
@@ -32,7 +43,10 @@ public class DriveTrain extends SubsystemBase {
     boolean left_side_inverted = Constants.left_side_inverted;
     boolean right_side_inverted = Constants.right_side_inverted;
 
-    private final Gyro gyro = new ADXRS450_Gyro();
+    //private final Gyro gyro = new ADXRS450_Gyro();
+
+    //navX gyro
+    private final AHRS gyro = new AHRS(SPI.Port.kMXP); 
 
     private DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
@@ -40,15 +54,6 @@ public class DriveTrain extends SubsystemBase {
 
     public DriveTrain() {
         //MOTORS
-
-        
-
-        leftMotor1.setInverted(left_side_inverted);
-        leftMotor2.setInverted(InvertType.FollowMaster);
-
-        rightMotor1.setInverted(right_side_inverted);
-        rightMotor2.setInverted(InvertType.FollowMaster);
-          
         leftMotor1.setNeutralMode(NeutralMode.Brake);
         leftMotor2.setNeutralMode(NeutralMode.Coast);
         rightMotor1.setNeutralMode(NeutralMode.Brake);
@@ -63,6 +68,12 @@ public class DriveTrain extends SubsystemBase {
         //MotorControllerGroup does not work, below is the way to do it
         leftMotor2.follow(leftMotor1);
         rightMotor2.follow(rightMotor1);
+
+        leftMotor1.setInverted(left_side_inverted);
+        leftMotor2.setInverted(InvertType.FollowMaster);
+
+        rightMotor1.setInverted(right_side_inverted);
+        rightMotor2.setInverted(InvertType.FollowMaster);
 
         drive = new DifferentialDrive(leftMotor1, rightMotor1);
         
@@ -86,18 +97,23 @@ public class DriveTrain extends SubsystemBase {
     public void periodic() {
         // Update the odometry in the periodic block
 
-        var gyroAngle = Rotation2d.fromDegrees(gyro.getAngle());
+        var gyroAngle = gyro.getRotation2d();
 
-        //for get distance, multiply distance per pulse by position/pulses/units of sensor 
+        //for get distance, multiply distance per pulse by counts/units of sensor 
         //(position of sensor should overflow, as in not go back to zero once it goes from 2048-2049, with 2048 being the CPR of the integrated encoder)
-        double leftEncoderPosition = Constants.kDistancePerEncoderCycle*leftMotor1.getSelectedSensorPosition();
-        double rightEncoderPosition = Constants.kDistancePerEncoderCycle*rightMotor1.getSelectedSensorPosition();
+        double leftEncoderPosition = Constants.kDistancePerEncoderCount*leftMotor1.getSelectedSensorPosition();
+        double rightEncoderPosition = Constants.kDistancePerEncoderCount*rightMotor1.getSelectedSensorPosition();
 
         odometry.update(
             gyroAngle, leftEncoderPosition, rightEncoderPosition);
 
         SmartDashboard.putNumber("Left Encoder Position", leftEncoderPosition);
         SmartDashboard.putNumber("Right Encoder Position", rightEncoderPosition);
+        SmartDashboard.putNumber("Gyro Heading", gyro.getAngle());
+
+        var translation = odometry.getPoseMeters().getTranslation();
+        SmartDashboard.putNumber("X Position", translation.getX());
+        SmartDashboard.putNumber("Y Position", translation.getY());
 
     }
     
@@ -116,6 +132,8 @@ public class DriveTrain extends SubsystemBase {
     }
 
     //SIMULATION
+    //https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java%20General/DifferentialDrive_Simulation/src/main/java/frc/robot/Robot.java
+    //^^Use this in the future
     //@Override
     //public void simulationPeriodic() {
     //    TalonFXSimCollection leftMotor1Sim = leftMotor1.getSimCollection();
@@ -126,16 +144,14 @@ public class DriveTrain extends SubsystemBase {
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
 
-        //getSelectedSensorVelocity gives pulses per 100ms
+        //getSelectedSensorVelocity gives pulses/counts per 100ms
         //convert to pules per second (multiply)
-        //multiply result by Constants.kDistancePerEncoderCycle
-            //^^AKA, multiplying pulses per second by Distance (meters) per pulse to get Distance (meters) per second
+        //multiply result by Constants.kDistancePerEncoderCount
+            //^^AKA, multiplying pulses/counts per second by Distance (meters) per pulse/count to get Distance (meters) per second
                                                                         //Convert from 100ms to 1 second
-        double leftEncoderVelocity = Constants.kDistancePerEncoderCycle*(leftMotor1.getSelectedSensorVelocity()*10); 
+        double leftEncoderVelocity = Constants.kDistancePerEncoderCount*(leftMotor1.getSelectedSensorVelocity()*10); 
 
-        double rightEncoderVelocity = Constants.kDistancePerEncoderCycle*(leftMotor1.getSelectedSensorVelocity()*10); 
-        
-        
+        double rightEncoderVelocity = Constants.kDistancePerEncoderCount*(rightMotor1.getSelectedSensorVelocity()*10); 
 
         return new DifferentialDriveWheelSpeeds(leftEncoderVelocity, rightEncoderVelocity);
     }

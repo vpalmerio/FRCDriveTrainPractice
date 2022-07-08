@@ -29,7 +29,7 @@ public class AutonomousCommand {
                                    Constants.kvVoltSecondsPerMeter,
                                    Constants.kaVoltSecondsSquaredPerMeter),
         Constants.kDriveKinematics,
-        7
+        4
     );
 
     TrajectoryConfig config =
