@@ -12,14 +12,9 @@ public class IdleCommand implements Runnable {
         this.driveTrain = driveTrain;
     }
 
-    
-    public void initialize() {
-        driveTrain.tankDriveVolts(0, 0); //stops robot from moving
-    }
-
     @Override
     public void run() {
-            driveTrain.tankDriveVolts(0,0);
+        driveTrain.tankDriveVolts(0,0); //stops robot from moving
     }
     
 }
