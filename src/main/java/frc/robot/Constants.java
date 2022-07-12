@@ -16,7 +16,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
  */
 public final class Constants {
 
-    public static int xboxControllerPort = 1;
+    public static int xboxControllerPort = 0;
 
     public static int left1CANPort = 2;
     public static int left2CANPort = 3;
@@ -29,12 +29,12 @@ public final class Constants {
 
     //currently unrealistic values because we screwed up testing
     public static final double ksVolts = 0.59348;
-    public static final double kvVoltSecondsPerMeter = 0.1763; // 2.1763;
+    public static final double kvVoltSecondsPerMeter = 2.1763; // 2.1763;
     public static final double kaVoltSecondsSquaredPerMeter = 0.15926;
     public static final double kPDriveVel = 2.457;
 
     //distance between centers of the left side center of one wheel to the right center of the other wheel, across the robot chassis
-    public static final double kTrackWidthMeters = 0.5969;
+    public static final double kTrackWidthMeters = 0.6169;
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackWidthMeters);
     
@@ -48,11 +48,9 @@ public final class Constants {
     public static final double kRamseteZeta = 0.7;
 
     
-    
-   
    
     //Getting distance traveled per encoder cycle
-    public static final double kWheelDiameterMeters = 0.1524; //measured
+    public static final double kWheelDiameterMeters = 0.14605; //measured
 
     public static final int kEncoderCPR = 2048; //this is according to Falcon500 documentation
     //encoder counts per revolution (one full turn of motor shaft), also, pulses can be interpreted as counts
