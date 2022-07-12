@@ -16,6 +16,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
  */
 public final class Constants {
 
+    public static String trajectoryJSON = "paths/Circle.wpilib.json";
+
     public static int xboxControllerPort = 0;
 
     public static int left1CANPort = 2;

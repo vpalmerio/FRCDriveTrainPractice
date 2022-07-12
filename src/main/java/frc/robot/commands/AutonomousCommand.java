@@ -38,50 +38,62 @@ public class AutonomousCommand {
             .addConstraint(autoVoltageConstraint)
             .setReversed(false); //voltage constraint
 
-    //Taken from wpilib tutorial
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(
-            new Translation2d(1, -1),
-            new Translation2d(2, 1)
-        ),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        // Pass config
-        config
-    );
+    Pose2d initialPose;
 
-    RamseteCommand ramseteCommand = new RamseteCommand(
-        exampleTrajectory,
-        driveTrain::getPose,
-        new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
-        new SimpleMotorFeedforward(Constants.ksVolts,
-                                   Constants.kvVoltSecondsPerMeter,
-                                   Constants.kaVoltSecondsSquaredPerMeter),
-        Constants.kDriveKinematics,
-        driveTrain::getWheelSpeeds,
-        new PIDController(Constants.kPDriveVel, 0, 0),
-        new PIDController(Constants.kPDriveVel, 0, 0),
-        // RamseteCommand passes volts to the callback
-        driveTrain::tankDriveVolts,
-        driveTrain
-    );
+    public Command createAutonomousCommand(Trajectory trajectory) {
+        
+        initialPose = trajectory.getInitialPose();
 
-    public void resetOdometryInitialPose() {
-        driveTrain.resetOdometry(exampleTrajectory.getInitialPose());
-    }
-
-    public Command getRamseteCommand() {
-        // Reset odometry to the starting pose of the trajectory.
-        resetOdometryInitialPose();
+        RamseteCommand autonomousCommand = new RamseteCommand(
+            trajectory,
+            driveTrain::getPose,
+            new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
+            new SimpleMotorFeedforward(Constants.ksVolts,
+                                    Constants.kvVoltSecondsPerMeter,
+                                    Constants.kaVoltSecondsSquaredPerMeter),
+            Constants.kDriveKinematics,
+            driveTrain::getWheelSpeeds,
+            new PIDController(Constants.kPDriveVel, 0, 0),
+            new PIDController(Constants.kPDriveVel, 0, 0),
+            // RamseteCommand passes volts to the callback
+            driveTrain::tankDriveVolts,
+            driveTrain
+        );
 
         IdleCommand idle = new IdleCommand(driveTrain);
 
         RunCommand looped_idle = new RunCommand(idle, driveTrain);
 
-        return ramseteCommand.andThen(looped_idle);
+        return autonomousCommand.andThen(looped_idle);
+    }
+
+    public void resetOdometryInitialPose() {
+        driveTrain.resetOdometry(initialPose);
+    }
+
+    public Command getExampleRamseteCommand() {
+
+        //Taken from wpilib tutorial
+        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+            // Start at the origin facing the +X direction
+            new Pose2d(0, 0, new Rotation2d(0)),
+            // Pass through these two interior waypoints, making an 's' curve path
+            List.of(
+                new Translation2d(1, -1),
+                new Translation2d(2, 1)
+            ),
+            // End 3 meters straight ahead of where we started, facing forward
+            new Pose2d(3, 0, new Rotation2d(0)),
+            // Pass config
+            config
+        );
+
+        initialPose = exampleTrajectory.getInitialPose();
+
+        Command ramseteCommand = createAutonomousCommand(exampleTrajectory);
+        
+
+        return ramseteCommand;
     }
 
 }

@@ -4,6 +4,17 @@
 
 package frc.robot;
 
+
+//Load Path
+import java.nio.file.Path;
+
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
+import java.io.IOException;
+
+//Neccessary stuff
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -30,7 +41,20 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand(); //m_robotContainer.getAutonomousCommand();
+    
+    String trajectoryJSON = Constants.trajectoryJSON;
+
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+      m_autonomousCommand = m_robotContainer.loadAutonomousCommand(trajectory);
+    } catch (IOException ex) {
+        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+        m_autonomousCommand = null;
+    }
+
+    //m_autonomousCommand = m_robotContainer.getExampleAutonomousCommand();
+    
   }
 
   /**
