@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.GenericHID;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -53,8 +54,12 @@ public class RobotContainer {
     return teleopCommand;
   }
 
-  public Command getAutonomousCommand() {
-    return autoCommand.getRamseteCommand();
+  public Command getExampleAutonomousCommand() {
+    return autoCommand.getExampleRamseteCommand();
+  }
+
+  public Command loadAutonomousCommand(Trajectory trajectory) {
+    return autoCommand.createAutonomousCommand(trajectory);
   }
 
   public void resetOdometryAutonomous() {

@@ -100,7 +100,7 @@ public class DriveTrain extends SubsystemBase {
         rightMotor2.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);   
 
         
-        //Velocity Measurement period of 1 millisecond and rolling measurement window of 1
+        //Velocity Measurement period of 1 millisecond and rolling measurement window of 1 (sample)
         //apparently this is the best for accuracy
         //https://www.chiefdelphi.com/t/limiting-voltage-pathweaver-and-ramesetecommand/405377/14
 
@@ -212,6 +212,8 @@ public class DriveTrain extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
+        double[] initialXandY = {pose.getX(), pose.getY()};
+        SmartDashboard.putNumberArray("Initial Pose", initialXandY);
         resetEncoders();
         odometry.resetPosition(pose, gyro.getRotation2d());
     }
