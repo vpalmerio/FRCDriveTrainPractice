@@ -60,4 +60,8 @@ public class RobotContainer {
   public void resetOdometryAutonomous() {
     autoCommand.resetOdometryInitialPose();
   }
+
+  public boolean collisionDetection() {
+    return driveTrain.collisionDetection();
+  }
 }

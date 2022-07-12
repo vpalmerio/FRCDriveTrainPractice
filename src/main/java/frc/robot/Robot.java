@@ -69,7 +69,10 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-
+    if(m_robotContainer.collisionDetection()) {
+        m_autonomousCommand.cancel();
+        disabledInit();
+    }
   }
 
   @Override

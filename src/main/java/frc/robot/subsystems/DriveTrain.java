@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 //Falcon Motors
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -10,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 
 //Gyro
 import com.kauailabs.navx.frc.AHRS;
@@ -32,7 +34,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 //Constants
 import frc.robot.Constants;
 
-
 public class DriveTrain extends SubsystemBase {
     private final WPI_TalonFX 
         leftMotor1 = new WPI_TalonFX(Constants.left1CANPort), 
@@ -51,6 +52,15 @@ public class DriveTrain extends SubsystemBase {
     private DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
     DifferentialDrive drive;
+
+    //Encoders
+    int window_size = 1;
+    SensorVelocityMeasPeriod measurement_period = SensorVelocityMeasPeriod.Period_1Ms;
+
+    //Collision Detection
+    double last_world_linear_accel_x = 0;
+    double last_world_linear_accel_y = 0;
+    final static double kCollisionThreshold_DeltaG = 2;
 
     public DriveTrain() {
         //MOTORS
@@ -87,8 +97,22 @@ public class DriveTrain extends SubsystemBase {
         leftMotor1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         leftMotor2.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         rightMotor1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-        rightMotor2.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);        
+        rightMotor2.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);   
 
+        
+        //Velocity Measurement period of 1 millisecond and rolling measurement window of 1
+        //apparently this is the best for accuracy
+        //https://www.chiefdelphi.com/t/limiting-voltage-pathweaver-and-ramesetecommand/405377/14
+
+        leftMotor1.configVelocityMeasurementPeriod(measurement_period);
+        leftMotor1.configVelocityMeasurementWindow(window_size);
+        leftMotor2.configVelocityMeasurementPeriod(measurement_period);
+        leftMotor2.configVelocityMeasurementWindow(window_size);
+        rightMotor1.configVelocityMeasurementPeriod(measurement_period);
+        rightMotor1.configVelocityMeasurementWindow(window_size);
+        rightMotor2.configVelocityMeasurementPeriod(measurement_period);
+        rightMotor2.configVelocityMeasurementWindow(window_size);
+        
 
         resetEncoders();
     }
@@ -104,8 +128,7 @@ public class DriveTrain extends SubsystemBase {
         double leftEncoderPosition = Constants.kDistancePerEncoderCount*leftMotor1.getSelectedSensorPosition();
         double rightEncoderPosition = Constants.kDistancePerEncoderCount*rightMotor1.getSelectedSensorPosition();
 
-        odometry.update(
-            gyroAngle, leftEncoderPosition, rightEncoderPosition);
+        odometry.update(gyroAngle, leftEncoderPosition, rightEncoderPosition);
 
         SmartDashboard.putNumber("Left Encoder Position", leftEncoderPosition);
         SmartDashboard.putNumber("Right Encoder Position", rightEncoderPosition);
@@ -115,6 +138,25 @@ public class DriveTrain extends SubsystemBase {
         SmartDashboard.putNumber("X Position", translation.getX());
         SmartDashboard.putNumber("Y Position", translation.getY());
 
+    }
+
+    public boolean collisionDetection() {
+        
+        //taken from https://pdocs.kauailabs.com/navx-mxp/examples/collision-detection/
+        double curr_world_linear_accel_x = gyro.getWorldLinearAccelX();
+        double currentJerkX = curr_world_linear_accel_x - last_world_linear_accel_x;
+        last_world_linear_accel_x = curr_world_linear_accel_x;
+        double curr_world_linear_accel_y = gyro.getWorldLinearAccelY();
+        double currentJerkY = curr_world_linear_accel_y - last_world_linear_accel_y;
+        last_world_linear_accel_y = curr_world_linear_accel_y;
+        
+        if ( ( Math.abs(currentJerkX) > kCollisionThreshold_DeltaG ) || ( Math.abs(currentJerkY) > kCollisionThreshold_DeltaG) ) 
+        {
+            SmartDashboard.putBoolean("Collision", true);
+            return true;
+        } else {
+            return false;
+        }
     }
     
     //DRIVE
