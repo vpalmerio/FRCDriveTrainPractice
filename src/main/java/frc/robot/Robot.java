@@ -7,6 +7,7 @@ package frc.robot;
 
 //Load Path
 import java.nio.file.Path;
+import java.sql.Driver;
 
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
@@ -16,6 +17,8 @@ import java.io.IOException;
 
 //Neccessary stuff
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -42,16 +45,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     
-    String trajectoryJSON = Constants.trajectoryJSON;
-
-    try {
-      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-      Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-      m_autonomousCommand = m_robotContainer.loadAutonomousCommand(trajectory);
-    } catch (IOException ex) {
-        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-        m_autonomousCommand = null;
-    }
+    
 
     //m_autonomousCommand = m_robotContainer.getExampleAutonomousCommand();
     
@@ -77,12 +71,45 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {}
 
+
+  private static final String quickPathTrajectoryJSON = "paths/QuickPath.wpilib.json";
+
+  private static final Field2d m_field = new Field2d();
+
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+
+    /*
+    try {
+      //eventually use hashes to check if the previous hash is different from the new hash, then load the new trajectory
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(quickPathTrajectoryJSON);
+      Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+      
+      SmartDashboard.putData(m_field);
+      m_field.getObject("traj").setTrajectory(trajectory);
+    } catch (IOException ex) {
+      DriverStation.reportWarning("Unable to open trajectory: " + quickPathTrajectoryJSON, ex.getStackTrace());
+    }
+    */
+
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+
+    //String trajectoryJSON = Constants.quickPathTrajectoryJSON;
+    String trajectoryJSON = Constants.circleTrajectoryJSON;
+
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      Trajectory trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+      m_autonomousCommand = m_robotContainer.loadAutonomousCommand(trajectory);
+    } catch (IOException ex) {
+      DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+      m_autonomousCommand = null;
+    }
+
     m_robotContainer.resetOdometryAutonomous();
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
