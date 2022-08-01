@@ -122,6 +122,7 @@ public class DriveTrain extends SubsystemBase {
         // Update the odometry in the periodic block
 
         var gyroAngle = gyro.getRotation2d();
+        gyro.getDisplacementX();
 
         //for get distance, multiply distance per pulse by counts/units of sensor 
         //(position of sensor should overflow, as in not go back to zero once it goes from 2048-2049, with 2048 being the CPR of the integrated encoder)
@@ -129,6 +130,8 @@ public class DriveTrain extends SubsystemBase {
         double rightEncoderPosition = Constants.kDistancePerEncoderCount*rightMotor1.getSelectedSensorPosition();
 
         odometry.update(gyroAngle, leftEncoderPosition, rightEncoderPosition);
+        
+        
 
         SmartDashboard.putNumber("Left Encoder Position", leftEncoderPosition);
         SmartDashboard.putNumber("Right Encoder Position", rightEncoderPosition);
@@ -202,6 +205,7 @@ public class DriveTrain extends SubsystemBase {
         return gyro.getRotation2d().getDegrees();
     }
 
+
     public Pose2d getPose() {
         return odometry.getPoseMeters();
     }
@@ -212,8 +216,8 @@ public class DriveTrain extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
-        double[] initialXandY = {pose.getX(), pose.getY()};
-        SmartDashboard.putNumberArray("Initial Pose", initialXandY);
+        //double[] initialXandY = {pose.getX(), pose.getY()};
+        //SmartDashboard.putNumberArray("Initial Pose", initialXandY);
         resetEncoders();
         odometry.resetPosition(pose, gyro.getRotation2d());
     }

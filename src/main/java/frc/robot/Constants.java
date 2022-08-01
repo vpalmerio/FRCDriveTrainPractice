@@ -16,7 +16,9 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
  */
 public final class Constants {
 
-    public static String trajectoryJSON = "paths/Circle.wpilib.json";
+    public static String quickPathTrajectoryJSON = "paths/QuickPath/generatedJSON/QuickPath.wpilib.json";
+    public static String circleTrajectoryJSON = "paths/Circle.wpilib.json";
+    public static String weirdTrajectoryJSON = "paths/intentionally-weird.wpilib.json";
 
     public static int xboxControllerPort = 0;
 
@@ -62,7 +64,7 @@ public final class Constants {
         //second gear ratio, 20:28
         //multiply the two to get 180:1736
         //its a gear reduction (for every turn of the motor shaft, the robot wheel only turns a fraction of its full revolution)
-            //^^flip gear ratios 1736:180 (does this matter? sys id requires it flipped like this, as far as I understand)
+            //^^flip gear ratios 1736:180 (sys id requires it flipped like this, as far as I understand)
             //convert to x/1 -> 1736/180:180/180 = 9.6444... : 1
         //the motor shaft must turn 9.6444.. times for the robot wheel to make a full revolution
     public static final double kGearRatio = 1736/180;
